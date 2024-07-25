@@ -119,6 +119,8 @@ class OVMMNavGoalSegmentationSensor(Sensor):
                 episode.candidate_start_receps,
                 "rec",
             )
+            if obs[..., 0].max() == 1 and hasattr(task, "_seen_goal_obj"):
+                task._seen_goal_obj = True
         else:
             obs[..., 0] = self._get_obs_channel(
                 pan_obs,

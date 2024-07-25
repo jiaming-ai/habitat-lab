@@ -74,10 +74,12 @@ def distributed_var_mean(
     world_size = distrib.get_world_size()
 
     mean = values.mean()
+    # print(f"All reduce mean: {mean}, Rank: {distrib.get_rank()}")
     distrib.all_reduce(mean)
     mean = mean / world_size
 
     var = (values - mean).pow(2).mean()
+    # print(f"All reduce var: {var}, Rank: {distrib.get_rank()}")
     distrib.all_reduce(var)
     var = var / world_size
 
@@ -138,6 +140,7 @@ class DecentralizedDistributedMixin:
                     )
 
         self._evaluate_actions_wrapper = Guard(_EvalActionsWrapper(self.actor_critic), self.device)  # type: ignore
+        # self._evaluate_actions_wrapper = Guard(self.actor_critic, self.device)  # type: ignore
 
     def _evaluate_actions(self, *args, **kwargs):
         r"""Internal method that calls Policy.evaluate_actions.  This is used instead of calling
@@ -147,9 +150,15 @@ class DecentralizedDistributedMixin:
         # So we need to make anything that is on the CPU into a numpy array
         # This is needed for older versions of pytorch that haven't deprecated
         # the single-process multi-device version of DDP
+
         return self._evaluate_actions_wrapper.ddp(
             *_cpu_to_numpy(args), **_cpu_to_numpy(kwargs)
         )
+        # with self._evaluate_actions_wrapper.ddp.join():
+        #     ret = self._evaluate_actions_wrapper.ddp(
+        #         *_cpu_to_numpy(args), **_cpu_to_numpy(kwargs)
+        #     )
+        # return ret
 
 
 @baseline_registry.register_updater

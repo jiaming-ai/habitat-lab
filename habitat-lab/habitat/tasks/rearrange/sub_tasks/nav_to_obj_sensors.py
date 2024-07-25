@@ -162,18 +162,24 @@ class NavToObjReward(RearrangeReward):
             **kwargs,
         )
         reward = self._metric
-        cur_dist = task.measurements.measures[
-            self._dist_to_goal_cls_uuid
-        ].get_metric()
-        if self._prev_dist < 0.0:
-            dist_diff = 0.0
-        else:
-            dist_diff = self._prev_dist - cur_dist
 
-        reward += self._dist_reward * dist_diff
-        self._prev_dist = cur_dist
+        # TODO this is a hack
+        cur_dist = 1000
+        if not task.only_give_goal_reward_after_first_seen or task._seen_goal_obj:
+            cur_dist = task.measurements.measures[
+                self._dist_to_goal_cls_uuid
+            ].get_metric()
 
-        if self._should_reward_turn and cur_dist < self._turn_reward_dist:
+            if self._prev_dist < 0.0:
+                dist_diff = 0.0
+            else:
+                dist_diff = self._prev_dist - cur_dist
+
+            reward += self._dist_reward * dist_diff
+            self._prev_dist = cur_dist
+
+        if self._should_reward_turn and cur_dist < self._turn_reward_dist \
+            and (not task.only_give_goal_reward_after_first_seen or task._seen_goal_obj): 
             angle_dist = task.measurements.measures[
                 self._rot_dist_to_goal_cls_uuid
             ].get_metric()

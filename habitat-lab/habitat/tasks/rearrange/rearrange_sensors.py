@@ -1161,7 +1161,7 @@ class CameraPoseSensor(Sensor):
         start_trans[:3, 3] = start_pos
         start_trans = mn.Matrix4(start_trans)
         agent_trans = self._sim._default_agent.scene_node.transformation
-        return (
+        return np.array(
             start_trans.inverted()
             @ agent_trans
             @ self._sim._sensors[
