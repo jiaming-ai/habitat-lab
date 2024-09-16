@@ -19,6 +19,7 @@ from habitat.articulated_agents.robots import (
     FetchRobotNoWheels,
     SpotRobot,
     StretchRobot,
+    WheelChair,
 )
 from habitat.articulated_agents.robots.fetch_suction import FetchSuctionRobot
 from habitat.tasks.rearrange.rearrange_grasp_manager import (
